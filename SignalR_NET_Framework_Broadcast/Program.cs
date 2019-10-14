@@ -35,7 +35,7 @@ namespace SignalR_NET_Framework_Broadcast {
 
             IHubProxy proxy = hubConnection.CreateHubProxy("ObjectHub");
 
-            proxy.On("sendIntObj", (res) => {
+            proxy.On("SendSomething", (res) => {
                 Console.WriteLine("Incoming data: {0}", res);
                 //throw new ArgumentNullException();
             });
@@ -44,6 +44,13 @@ namespace SignalR_NET_Framework_Broadcast {
 
             Console.WriteLine("\tStarting client connection...");
             await hubConnection.Start();
+            Console.WriteLine("\tConnection id: " + hubConnection.ConnectionId.ToString());
+            await proxy.Invoke("SendSomething", new object[] { }); 
+
+            Console.WriteLine("\tPress anything to cancel... ");
+            Console.ReadKey();
+
+            //await hubConnection.Start();
         }
     }
 
@@ -62,7 +69,7 @@ namespace SignalR_NET_Framework_Broadcast {
         public string SendIntObj() { //server sends int obj
             Console.WriteLine("Request int object");
 
-            string connectionstring = "Data Source=DESKTOP-G59947P\\SQLEXPRESS;Initial Catalog=dbo;Integrated Security=True";
+            string connectionstring = "Data Source=DESKTOP-G59947P\\SQLEXPRESS;Initial Catalog=model;Integrated Security=True";
 
             using (var connection = new SqlConnection(connectionstring)) {//ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString)) {
                 //string query = "SELECT  NewMessageCount, NewCircleRequestCount, NewNotificationsCount, NewJobNotificationsCount FROM [dbo].[Modeling_NewMessageNotificationCount] WHERE UserProfileId=" + "61764";
@@ -92,6 +99,12 @@ namespace SignalR_NET_Framework_Broadcast {
 
             return context.Clients.All.RecieveNotification(intObj);
 
+        }
+
+        [HubMethodName("SendSomething")] //use this to start connection
+        public string SendSomething() {
+            Console.WriteLine("Send something request");
+            return "this si a stirng";// GlobalHost.ConnectionManager.GetHubContext<ObjectHub>().Clients.All.SendSomething("String!");// .ReceiveNotification("This is a srting");
         }
 
         private void dependency_OnChange(object sender, SqlNotificationEventArgs e) {
