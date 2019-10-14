@@ -13,7 +13,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SignalR_NET_Framework_Broadcast {
+    public static class GlobalV {
+        public static string connectionstring = "Data Source=DESKTOP-G59947P\\SQLEXPRESS;Initial Catalog=msdb;Integrated Security=True";
+    };
+    
+
     class Program {
+
         static void Main(string[] args) {
             Console.WriteLine("Attempt to startup");
 
@@ -34,18 +40,23 @@ namespace SignalR_NET_Framework_Broadcast {
             hubConnection.TraceWriter = Console.Out;
 
             IHubProxy proxy = hubConnection.CreateHubProxy("ObjectHub");
-
+            /*
             proxy.On("SendSomething", (res) => {
                 Console.WriteLine("Incoming data: {0}", res);
                 //throw new ArgumentNullException();
             });
-
+            */
 //            System.Net.ServicePointManager.DefaultConnectionLimit = 10;
 
             Console.WriteLine("\tStarting client connection...");
             await hubConnection.Start();
             Console.WriteLine("\tConnection id: " + hubConnection.ConnectionId.ToString());
-            await proxy.Invoke("SendSomething", new object[] { }); 
+            //await proxy.Invoke("SendSomething", new object[] { }); 
+            String ret = proxy.Invoke<String>("SendSomething", new object[] { }).Result;
+            Console.WriteLine("\tReceived line: {0}", ret);
+
+            Int16 ret2 = proxy.Invoke<Int16>("SendIntObj", new object[] { }).Result;
+            Console.WriteLine("\tReceived int: {0}", ret2);
 
             Console.WriteLine("\tPress anything to cancel... ");
             Console.ReadKey();
@@ -56,6 +67,7 @@ namespace SignalR_NET_Framework_Broadcast {
 
     public class Startup {
         public void Configuration(IAppBuilder app) {
+            System.Data.SqlClient.SqlDependency.Start(GlobalV.connectionstring);
             app.MapSignalR();
         }
 
@@ -64,14 +76,15 @@ namespace SignalR_NET_Framework_Broadcast {
     public class ObjectHub : Hub {
         Int16 intObj = 0;
 
-        [HubMethodName("sendIntObj")] //use this to start connection
+        [HubMethodName("SendIntObj")] //use this to start connection
 
-        public string SendIntObj() { //server sends int obj
+        public Int16 SendIntObj() { //server sends int obj
             Console.WriteLine("Request int object");
 
-            string connectionstring = "Data Source=DESKTOP-G59947P\\SQLEXPRESS;Initial Catalog=model;Integrated Security=True";
-
-            using (var connection = new SqlConnection(connectionstring)) {//ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString)) {
+            //Before SQLConnection, run the query
+            //alter database msdb set enable_broker with rollback immediate;
+            //The table was created under msdb
+            using (var connection = new SqlConnection(GlobalV.connectionstring)) {//ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString)) {
                 //string query = "SELECT  NewMessageCount, NewCircleRequestCount, NewNotificationsCount, NewJobNotificationsCount FROM [dbo].[Modeling_NewMessageNotificationCount] WHERE UserProfileId=" + "61764";
                 string query = "SELECT IntObj FROM [dbo].[Model_Test] WHERE UserID=" + "3";
                 connection.Open();
@@ -95,10 +108,11 @@ namespace SignalR_NET_Framework_Broadcast {
 
             }
 
-            IHubContext context = GlobalHost.ConnectionManager.GetHubContext<ObjectHub>();
+            //IHubContext context = GlobalHost.ConnectionManager.GetHubContext<ObjectHub>();
 
-            return context.Clients.All.RecieveNotification(intObj);
+            //return context.Clients.All.RecieveNotification(intObj);
 
+            return intObj;
         }
 
         [HubMethodName("SendSomething")] //use this to start connection
