@@ -40,7 +40,7 @@ namespace SignalR_NET_Framework_Broadcast {
                 //throw new ArgumentNullException();
             });
 
-            System.Net.ServicePointManager.DefaultConnectionLimit = 10;
+//            System.Net.ServicePointManager.DefaultConnectionLimit = 10;
 
             Console.WriteLine("\tStarting client connection...");
             await hubConnection.Start();
