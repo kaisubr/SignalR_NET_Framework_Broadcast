@@ -9,6 +9,8 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,23 +25,50 @@ namespace SignalR_NET_Framework_Broadcast {
         static void Main(string[] args) {
             Console.WriteLine("Attempt to startup");
 
-            string url = "http://localhost:8080";
+            /*string url = "http://localhost:44336/connect";//8080";
             using (WebApp.Start(url)) {
                 ObjectHub hub = new ObjectHub();
                 Console.WriteLine("Server running on {0}", url);
 
-                tryClient().Wait();
-            }
+                
+            }*/
+
+            //Notes:
+            //Start ar-sphere-server to start server.
+            //Open CMD (AS ADMIN!!) and run: netsh http add urlacl url=https://localhost:44336/connect/ user=Everyone
+            //Everything works fine.
+            //Then CMD, run: netsh http delete urlacl url=https://localhost:44336/connect/
+            tryARClient().Wait();
+        }
+
+        private static async Task tryARClient() {
+            Console.WriteLine("Attempt ARSphere client connection");
+
+            var hubConnection = new HubConnection("http://ar-sphere-server.azurewebsites.net/users/");//"https://localhost:44336/connect");
+
+            hubConnection.TraceLevel = TraceLevels.All;
+            hubConnection.TraceWriter = Console.Out;
+
+            IHubProxy proxy = hubConnection.CreateHubProxy("TestHub");
+            proxy.On<string>("Ping", (sres) => {
+                Console.WriteLine("Incoming data {0}", sres);
+            });
+            await hubConnection.Start();
+            string ret = await proxy.Invoke<string>("Ping", "random test");
+            Console.WriteLine("\tReceived string: {0}", ret);
+            hubConnection.Stop();
+
+            Console.ReadKey();
         }
 
         public static /*void*/ async Task tryClient() {
             Console.WriteLine("Attempt client connection");
-            var hubConnection = new HubConnection("http://localhost:8080");
+            var hubConnection = new HubConnection("http://localhost:8080");//44336/connect");
             
             hubConnection.TraceLevel = TraceLevels.All;
             hubConnection.TraceWriter = Console.Out;
 
-            IHubProxy proxy = hubConnection.CreateHubProxy("ObjectHub");
+            IHubProxy proxy = hubConnection.CreateHubProxy("ObjectHub");//"ObjectHub");
             /*
             proxy.On("SendSomething", (res) => {
                 Console.WriteLine("Incoming data: {0}", res);
