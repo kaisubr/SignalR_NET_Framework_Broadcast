@@ -6,20 +6,20 @@
     <members>
         <member name="T:Microsoft.AspNetCore.SignalR.JsonHubProtocolOptions">
             <summary>
-            Options used to configure a <see cref="T:Microsoft.AspNetCore.SignalR.Protocol.JsonHubProtocol"/> instance.
+            Options used to configure a <see cref="T:Microsoft.AspNetCore.SignalR.JsonHubProtocolOptions"/> instance.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.SignalR.JsonHubProtocolOptions.PayloadSerializerSettings">
+        <member name="P:Microsoft.AspNetCore.SignalR.JsonHubProtocolOptions.PayloadSerializerOptions">
             <summary>
             Gets or sets the settings used to serialize invocation arguments and return values.
             </summary>
         </member>
         <member name="T:Microsoft.AspNetCore.SignalR.Protocol.JsonHubProtocol">
             <summary>
-            Implements the SignalR Hub Protocol using JSON.
+            Implements the SignalR Hub Protocol using System.Text.Json.
             </summary>
         </member>
-        <member name="P:Microsoft.AspNetCore.SignalR.Protocol.JsonHubProtocol.PayloadSerializer">
+        <member name="F:Microsoft.AspNetCore.SignalR.Protocol.JsonHubProtocol._payloadSerializerOptions">
             <summary>
             Gets the serializer used to serialize invocation arguments and return values.
             </summary>

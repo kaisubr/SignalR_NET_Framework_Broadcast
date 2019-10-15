@@ -33,12 +33,11 @@ namespace SignalR_NET_Framework_Broadcast {
                 
             }*/
 
-            //Notes:
-            //Start ar-sphere-server to start server.
-            //Open CMD (AS ADMIN!!) and run: netsh http add urlacl url=https://localhost:44336/connect/ user=Everyone
-            //Everything works fine.
-            //Then CMD, run: netsh http delete urlacl url=https://localhost:44336/connect/
-            tryARClient().Wait();
+            //If connection problems, open cmd as admin and run:
+            //netsh http delete urlacl url=https://localhost:44336/connect/
+            Clientv2 c = new Clientv2();
+            c.tryClient().Wait();
+            //tryARClient().Wait();
         }
 
         private static async Task tryARClient() {
