@@ -8,7 +8,7 @@ namespace SignalR_NET_Framework_Broadcast {
         }
 
         public async Task tryClient() {
-            string url = "https://localhost:44336/connect";//"https://ar-sphere-server.azurewebsites.net/connect";
+            string url = "https://localhost:44336/connect"; //https://ar-sphere-server.azurewebsites.net/connect
             var hubCtion = new HubConnectionBuilder().WithUrl(url).Build();
             
             Console.WriteLine("Attempt connection...");
@@ -21,7 +21,12 @@ namespace SignalR_NET_Framework_Broadcast {
             });
             */
             string res = hubCtion.InvokeAsync<string>("Ping", "message").Result;
-            Console.WriteLine("Received after invoke: {0} ", res);
+            object o = hubCtion.InvokeAsync<object>("GetLastAnchor").Result;
+
+            if (o != null)
+                Console.WriteLine("Received after invoke: {0} ", res);
+            else
+                Console.WriteLine("Received null!");
             
             Console.ReadKey();
         }
